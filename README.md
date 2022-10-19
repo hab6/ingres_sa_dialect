@@ -13,9 +13,8 @@ It is important to be aware of which version of SQLAlchemy is installed. Version
 ```
 Version pinning examples:
 
-    pip install 'sqlalchemy < 2.0.0'
     python -m pip install 'sqlalchemy < 2.0.0'
-    python -m pip install sqlalchemy==1.4.41
+    python -m pip install sqlalchemy==1.4.42
  ```
  
 Jython/JDBC support is currently untested, as the current code relies on zxjdbc it is not recommended this be used (see https://hg.sr.ht/~clach04/jyjdbc for as an alternative that includes full Decimal datatype support).
@@ -44,10 +43,10 @@ TL;DR
 
 Install/setup:
 
-    pip install pyodbc sqlalchemy
+    python -m pip install pyodbc sqlalchemy
     git clone https://github.com/clach04/ingres_sa_dialect.git
     cd ingres_sa_dialect
-    pip install -e .
+    python -m pip install -e .
 
 
 Demo Sample / Sanity check:
@@ -56,11 +55,13 @@ Linux/Unix
 
     export SQLALCHEMY_INGRES_ODBC_DRIVER_NAME=INGRES Y1
     # or what ever the ODBC Driver name is; Actian, Ingres, etc.
+    # Only needed if program/environment is unable to identify the correct driver.
 
 Windows:
 
     SET SQLALCHEMY_INGRES_ODBC_DRIVER_NAME=INGRES Y1
     REM or what ever the ODBC Driver name is; Actian, Ingres, etc.
+    REM Only needed if program/environment is unable to identify the correct driver.
 
 NOTE ODBC Driver should be the same bitness as the Python interpreter. That is:
 
@@ -84,11 +85,11 @@ Assuming local DBMS, python session:
 
 Right now this is for dev purposes so install SQLAlchemy as per normal, for example:
 
-    pip install sqlalchemy
+    python -m pip install sqlalchemy
 
 or for dev testing and modifying/running tests:
 
-    git clone https://github.com/sqlalchemy/sqlalchemy.git
+    git clone -b rel_1_4_42 https://github.com/sqlalchemy/sqlalchemy.git
     cd sqlalchemy
     #pip install -e .
     python -m pip install -e .   # https://adamj.eu/tech/2020/02/25/use-python-m-pip-everywhere/
@@ -104,7 +105,7 @@ Download Ingres dialect for SQLAlchemy:
 Setup for dev use:
 
     cd ingres_sa_dialect
-    pip install -e .
+    python -m pip install -e .
 
 Demo/Test:
 
@@ -115,10 +116,12 @@ ODBC Driver name can be overridden via environment variable `SQLALCHEMY_INGRES_O
 Windows 64-bit:
 
     set SQLALCHEMY_INGRES_ODBC_DRIVER_NAME=Ingres CS
+    REM Only needed if program/environment is unable to identify the correct driver.
 
 Windows 32-bit:
 
     set SQLALCHEMY_INGRES_ODBC_DRIVER_NAME=Ingres CR
+    REM Only needed if program/environment is unable to identify the correct driver.
 
 Under Linux/Unix check ODBC settings and if using UnixODBC, check how wide-char support was built, recommendation for out-of-box Linux distributions:
 
@@ -136,13 +139,15 @@ export ODBCINI=$II_SYSTEM/ingres/files/odbc.ini
 ```python
 import sys
 import sqlalchemy
+#import ingres_sa_dialect
 
 print('Python %s on %s' % (sys.version, sys.platform))
 print('SQLAlchemy %r' % sqlalchemy.__version__)
 con_str = 'ingres:///demodb'  # local demodb
 #con_str = 'ingres://dbuser:PASSWORD@HOSTNAME:27832/db'  # remote database called "db"
 print(con_str)
-print(ingres_sa_dialect.base.dialect().create_connect_args(url=sqlalchemy.engine.make_url(con_str)))
+# If the next line is uncommented, need to also uncomment: import ingres_sa_dialect
+#print(ingres_sa_dialect.base.dialect().create_connect_args(url=sqlalchemy.engine.make_url(con_str)))
 
 engine = sqlalchemy.create_engine(con_str)
 connection = engine.connect()
