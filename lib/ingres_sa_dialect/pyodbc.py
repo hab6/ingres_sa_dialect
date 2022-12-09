@@ -29,7 +29,7 @@ class Ingres_pyodbc(IngresDialect):
         IngresDialect.__init__(self, **kwargs)
 
     @classmethod
-    def dbapi(cls):
+    def import_dbapi(cls):
         try:
             driver = __import__(Ingres_pyodbc.driver)
         except ModuleNotFoundError:
