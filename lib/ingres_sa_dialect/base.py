@@ -29,6 +29,7 @@ from sqlalchemy import types, schema
 from sqlalchemy.engine import default, reflection
 from sqlalchemy.schema import DDLElement
 from sqlalchemy.sql import compiler
+from sqlalchemy.sql.expression import func
 
 
 # https://docs.actian.com/actianx/11.1/index.html#page/SQLRef/TRANSACTION_ISOLATION_LEVEL.htm
@@ -74,8 +75,8 @@ ischema_names = {'ANSIDATE': types.Date,
            'VARCHAR': types.VARCHAR}
 
 class _IngresBoolean(types.Boolean):
-    def get_dbapi_type(self, dbapi):
-        return dbapi.TINYINT
+    def get_dbapi_type(self, import_dbapi):
+        return import_dbapi.TINYINT
     
     def result_processor(self, dialect):
         def process(value):
@@ -97,8 +98,8 @@ class _IngresBoolean(types.Boolean):
         return process
     
 class _IngresDateWithoutTime(types.Date):
-    def get_dbapi_type(self, dbapi):
-        return dbapi.DATE
+    def get_dbapi_type(self, import_dbapi):
+        return import_dbapi.DATE
     
     def result_processor(self, dialect):
         def process(value):
@@ -685,12 +686,10 @@ class IngresDialect(default.DefaultDialect):
                 rs.close()
     
     def get_default_schema_name(self, connection):
-        sqltext = """SELECT dbmsinfo('username')"""
         
         rs = None
         try:
-            # TODO consider using exec_driver_sql() instead
-            rs = connection.execute(sqltext)
+            rs = connection.execute(func.dbmsinfo('username'))
             return rs.fetchone()[0]
         finally:
             if rs:
