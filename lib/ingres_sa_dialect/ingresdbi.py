@@ -18,7 +18,7 @@ class Ingres_ingresdbi(IngresDialect):
         IngresDialect.__init__(self, **kwargs)
 
     @classmethod
-    def dbapi(cls):
+    def import_dbapi(cls):
         return __import__('ingresdbi')
 
     def create_connect_args(self, url):
